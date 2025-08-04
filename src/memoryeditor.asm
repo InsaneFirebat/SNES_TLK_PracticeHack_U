@@ -5,8 +5,7 @@
 
 MemoryEditorMenu:
     dw #memory_addr_bank
-    dw #memory_addr_hi
-    dw #memory_addr_lo
+    dw #memory_addr
     dw #$FFFF
     dw #memory_size
     dw #$FFFF
@@ -20,21 +19,8 @@ MemoryEditorMenu:
 memory_addr_bank:
     %cm_numfield_hex("Address Bank Byte", !ram_mem_address_bank, 0, 255, 1, 8, #0)
 
-memory_addr_hi:
-    %cm_numfield_hex("Address High Byte", !ram_mem_address_hi, 0, 255, 1, 8, .routine)
-  .routine
-    %a8()
-    XBA : LDA !ram_mem_address_lo
-    STA !ram_mem_address
-    RTL
-
-memory_addr_lo:
-    %cm_numfield_hex("Address Low Byte", !ram_mem_address_lo, 0, 255, 1, 8, .routine)
-  .routine
-    %a8()
-    XBA : LDA !ram_mem_address_hi : XBA
-    STA !ram_mem_address
-    RTL
+memory_addr:
+    %cm_numfield_hex_word("Address", !ram_mem_address, #$FFFF, #0)
 
 memory_size:
     dw !ACTION_CHOICE
@@ -56,19 +42,19 @@ memory_edit_write:
   .routine
     ; setup indirect addressing
     %a8()
-    LDA !ram_mem_address_lo : STA $40
-    LDA !ram_mem_address_hi : STA $41
-    LDA !ram_mem_address_bank : STA $42
+    LDA !ram_mem_address_lo : STA !DP_Address
+    LDA !ram_mem_address_hi : STA !DP_Address+1
+    LDA !ram_mem_address_bank : STA !DP_Address+2
 
     LDA !ram_mem_memory_size : BNE .eight_bit
     ; 16-bit write
     LDA !ram_mem_editor_hi : XBA : LDA !ram_mem_editor_lo
     %a16()
-    STA [$40]
+    STA [!DP_Address]
     RTL
   .eight_bit
     LDA !ram_mem_editor_hi : XBA : LDA !ram_mem_editor_lo
-    STA [$40]
+    STA [!DP_Address]
     RTL
 
 
@@ -111,9 +97,9 @@ cm_memory_editor:
     LDX #$0452 : JSL cm_draw4_hex
 
     ; assemble indirect address
-    LDA !ram_mem_address_bank : STA $42
-    LDA !ram_mem_address : STA $40
-    LDA [$40] : STA !ram_draw_value
+    LDA !ram_mem_address_bank : STA !DP_Address+2
+    LDA !ram_mem_address : STA !DP_Address
+    LDA [!DP_Address] : STA !ram_draw_value
 
     ; 16-bit or 8-bit
     LDA !ram_mem_memory_size : BNE .eight_bit
@@ -162,13 +148,13 @@ cm_memory_editor:
     LDX #$0508
     %a8()
     LDA #$00 : STA !ram_mem_line_position : STA !ram_mem_loop_counter
-    LDA $40 : AND #$F0 : STA $40
+    LDA !DP_Address : AND #$F0 : STA !DP_Address
 
   .drawLowerHalfNearby
     ; draw a byte
-    LDA [$40] : STA !ram_draw_value
+    LDA [!DP_Address] : STA !ram_draw_value
     JSL cm_draw2_hex
-    INC $40
+    INC !DP_Address
 
     ; inc tilemap position
     INX #6
@@ -193,21 +179,21 @@ cm_memory_editor:
 
   .drawUpperHalf
     %a16()
-    LDA !ram_mem_address_bank : STA $46
-    LDA !ram_mem_address : STA $44
-    LDA [$44] : STA !ram_draw_value
+    LDA !ram_mem_address_bank : STA !DP_Address+2
+    LDA !ram_mem_address : STA !DP_Address
+    LDA [!DP_Address] : STA !ram_draw_value
     LDX #$01E8 : JSL cm_draw4_hex
 
     LDX #$048A
     %a8()
     LDA #$00 : STA !ram_mem_line_position : STA !ram_mem_loop_counter
-    LDA $44 : AND #$F0 : STA $44
+    LDA !DP_Address : AND #$F0 : STA !DP_Address
 
   .drawUpperHalfNearby
     ; draw a byte
-    LDA [$44] : STA !ram_draw_value
+    LDA [!DP_Address] : STA !ram_draw_value
     JSL cm_draw2_hex
-    INC $44
+    INC !DP_Address
 
     ; inc tilemap position
     INX #6 : LDA !ram_mem_line_position : INC
