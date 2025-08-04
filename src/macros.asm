@@ -23,10 +23,6 @@ macro i16()
     REP #$10
 endmacro
 
-macro wdm()
-    dw $4242
-endmacro
-
 macro item_index_to_vram_index()
     ; Find screen position from Y (item number)
     TYA : ASL #5
@@ -108,9 +104,11 @@ macro cm_numfield_hex(title, addr, min, max, increment, heldincrement, jsltarget
     db !PALETTE_TEXT, "<title>", #$FF
 endmacro
 
-macro cm_numfield_hex_word(title, addr)
+macro cm_numfield_hex_word(title, addr, bitmask, jsltarget)
     dw !ACTION_NUMFIELD_HEX_WORD
     dl <addr>
+    dw <bitmask>
+    dw <jsltarget>
     db !PALETTE_TEXT, "<title>", #$FF
 endmacro
 
@@ -244,8 +242,8 @@ macro palettemenu(title, pointer, addr)
 endmacro
 
 macro setupRGB(addr)
-    LDA.w #<addr> : STA $38 ; addr
-    LDA.w #<addr>>>16 : STA $3A ; bank
+    LDA.w #<addr> : STA !DP_Temp ; addr
+    LDA.w #<addr>>>16 : STA !DP_Temp+2 ; bank
     JSL cm_setup_RGB
     RTS
 endmacro
@@ -258,4 +256,46 @@ endmacro
 macro cm_fixdp()
     PHD
     PEA $0000 : PLD
+endmacro
+
+macro SDE_add(label, value, mask, inverse)
+cm_SDE_add_<label>:
+; subroutine to add to a specific hex digit, used in cm_edit_digits
+    AND <mask> : CMP <mask> : BEQ .inc2zero
+    CLC : ADC <value> : BRA .store
+  .inc2zero
+    LDA #$0000
+  .store
+    STA !DP_DigitValue
+    ; return original value with edited digit masked away
+    LDA [!DP_DigitAddress] : AND <inverse>
+    RTS
+endmacro
+
+macro SDE_sub(label, value, mask, inverse)
+cm_SDE_sub_<label>:
+; subroutine to subtract from a specific hex digit, used in cm_edit_digits
+    AND <mask> : BEQ .set2max
+    SEC : SBC <value> : BRA .store
+  .set2max
+    LDA <mask>
+  .store
+    STA !DP_DigitValue
+    ; return original value with edited digit masked away
+    LDA [!DP_DigitAddress] : AND <inverse>
+    RTS
+endmacro
+
+macro SDE_dec(label, address)
+; increments or decrements an address based on controller input, used in cm_edit_decimal_digits
+    LDA !LK_Controller_Current : BIT !CTRL_UP : BNE .<label>_inc
+    ; dec
+    LDA <address> : DEC : BPL .store_<label>
+    LDA #$0009 : BRA .store_<label>
+  .<label>_inc
+    LDA <address> : INC
+    CMP #$000A : BMI .store_<label>
+    LDA #$0000
+  .store_<label>
+    STA <address>
 endmacro
