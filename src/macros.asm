@@ -215,27 +215,14 @@ macro palettemenu(title, pointer, addr)
     dw #palettes_dec_green
     dw #palettes_dec_blue
     dw #$FFFF
-    dw #<pointer>_hex_hi
-    dw #<pointer>_hex_lo
+    dw #<pointer>_hex
     dw #$0000
     %cm_header("<title>")
     %cm_footer("THREE WAYS TO EDIT COLORS")
 
-<pointer>_hex_hi:
-    %cm_numfield_hex("SNES BGR - HI BYTE", !ram_pal_hi, 0, 255, 1, 8, .routine)
+<pointer>_hex:
+    %cm_numfield_hex_word("SNES BGR", !ram_pal, #$7FFF, .routine)
   .routine
-    %a8() ; ram_pal_hi already in A
-    XBA : LDA !ram_pal_lo
-    %a16()
-    STA <addr>
-    JML MixBGR
-
-<pointer>_hex_lo:
-    %cm_numfield_hex("SNES BGR - LO BYTE", !ram_pal_lo, 0, 255, 1, 8, .routine)
-  .routine
-    %a8() ; ram_pal_lo already in A
-    XBA : LDA !ram_pal_hi : XBA
-    %a16()
     STA <addr>
     JML MixBGR
 }

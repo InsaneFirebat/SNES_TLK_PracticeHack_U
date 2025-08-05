@@ -323,8 +323,7 @@ cm_setup_RGB:
     LDA [!DP_Temp] : AND #$03E0 : LSR #5 : STA !ram_pal_green
     LDA [!DP_Temp] : AND #$001F : STA !ram_pal_red
     ; Split 16-bit value into two 16-bit values for the menu
-    LDA [!DP_Temp] : %a8() : STA !ram_pal_lo
-    XBA : STA !ram_pal_hi
+    LDA [!DP_Temp] : STA !ram_pal
     %a16()
     RTL
 }
@@ -344,9 +343,7 @@ MixRGB:
     STA [!DP_Temp] ; store combined color value
 
     ; update split values as well
-    %a8()
-    STA !ram_pal_lo : XBA : STA !ram_pal_hi
-    %a16()
+    STA !ram_pal
 
     JSL refresh_custom_palettes
     RTL

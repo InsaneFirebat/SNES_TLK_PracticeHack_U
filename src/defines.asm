@@ -11,7 +11,7 @@
 !VERSION_MINOR = 0
 !VERSION_BUILD = 4
 !VERSION_REV_1 = 0
-!VERSION_REV_2 = 1
+!VERSION_REV_2 = 2
 !SRAM_VERSION = #$0001 ; inc this to force initialization of new SRAM
 
 !TILE_CLEAR = #$0140
@@ -99,8 +99,8 @@
 !ram_cm_difficulty = !MENU_RAM_START+$38
 !ram_cm_horizontal_cursor = !MENU_RAM_START+$3A
 
-!DP_JSLTarget = $0000 ; 4
-!DP_Temp = $5C ; 4
+!DP_JSLTarget = $0000 ; 0x4
+!DP_Temp = $5C ; 0x4
 !DP_Frames = $5C
 !DP_Minimum = $5C
 !DP_Maximum = $5E
@@ -112,12 +112,12 @@
 !DP_Palette = $62
 !DP_MenuIndices = $64
 !DP_MenuBank = $66
-!DP_CurrentMenu = $68 ; 4
-!DP_Address = $6C ; 4
+!DP_CurrentMenu = $68 ; 0x4
+!DP_Address = $6C ; 0x4
 !DP_FirstDigit = $70
 !DP_SecondDigit = $72
 !DP_ThirdDigit = $74
-!DP_DigitAddress = $76 ; 4
+!DP_DigitAddress = $76 ; 0x4
 !DP_DigitValue = $7A
 !DP_DigitMinimum = $7C
 !DP_DigitMaximum = $7E
@@ -139,8 +139,7 @@
 !ram_pal_blue = !MENU_PALETTES+$40
 !ram_pal_green = !MENU_PALETTES+$42
 !ram_pal_red = !MENU_PALETTES+$44
-!ram_pal_lo = !MENU_PALETTES+$46
-!ram_pal_hi = !MENU_PALETTES+$48
+!ram_pal = !MENU_PALETTES+$46
 
 
 ; Non-menu RAM
@@ -160,7 +159,7 @@
 !ram_loadstate_4200 = !WRAM_START+$17 ; 0x1
 !ram_lag_display = !WRAM_START+$18
 
-; FREE SPACE ^
+; FREE SPACE ^ up to +$1E
 
 !ram_timer_frames = !WRAM_START+$20 ; 0x1
 !ram_timer_seconds = !WRAM_START+$21 ; 0x1
@@ -178,19 +177,18 @@
 !ram_mem_editor_active = !WRAM_START+$40
 !ram_mem_address_bank = !WRAM_START+$42
 !ram_mem_address = !WRAM_START+$44
-!ram_mem_address_hi = !WRAM_START+$46
-!ram_mem_address_lo = !WRAM_START+$48
-!ram_mem_memory_size = !WRAM_START+$4A
-!ram_mem_editor_hi = !WRAM_START+$4C
-!ram_mem_editor_lo = !WRAM_START+$4E
-!ram_draw_value = !WRAM_START+$50
-!ram_mem_line_position = !WRAM_START+$52
-!ram_mem_loop_counter = !WRAM_START+$54
-!ram_TimeControl_P1 = !WRAM_START+$56
-!ram_TimeControl_P2 = !WRAM_START+$58
-!LK_Controller_P2New = !WRAM_START+$5A
-!LK_Controller_P2Current = !WRAM_START+$5C
-!LK_Controller_P2Filtered = !WRAM_START+$5E
+!ram_mem_memory_size = !WRAM_START+$46
+!ram_mem_editor = !WRAM_START+$48
+!ram_draw_value = !WRAM_START+$4A
+!ram_mem_line_position = !WRAM_START+$4C
+!ram_mem_loop_counter = !WRAM_START+$4E
+!ram_TimeControl_P1 = !WRAM_START+$50
+!ram_TimeControl_P2 = !WRAM_START+$52
+!LK_Controller_P2New = !WRAM_START+$54
+!LK_Controller_P2Current = !WRAM_START+$56
+!LK_Controller_P2Filtered = !WRAM_START+$58
+
+; FREE SPACE ^ up to +$5E
 ; end of freespace @ $1F00
 
 

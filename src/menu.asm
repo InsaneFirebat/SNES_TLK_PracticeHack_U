@@ -400,8 +400,8 @@ NMI_tilemap_transfer:
     LDX #$80 : STX $2115 ; vram inc mode
     LDA #$7C20 : STA $2116 ; vram word addr
     LDA #$1801 : STA $4300 ; vram write mode
-    LDA #!ram_tilemap_buffer : STA $4302 ; source addr
-    LDA #!ram_tilemap_buffer>>16 : STA $4304 ; source bank
+    LDA.w #!ram_tilemap_buffer : STA $4302 ; source addr
+    LDA.w #!ram_tilemap_buffer>>16 : STA $4304 ; source bank
     LDA #$0640 : STA $4305 ; size
     LDX #$01 : STX $420B ; Enabled DMA
     PLP
@@ -907,11 +907,11 @@ draw_numfield_hex_word:
     ; load the value
     LDA [!DP_Address] : STA !DP_Value
 
-    ; Clear out the area
-    LDA !TILE_BLANK : STA !ram_tilemap_buffer+0,X
-                      STA !ram_tilemap_buffer+2,X
-                      STA !ram_tilemap_buffer+4,X
-                      STA !ram_tilemap_buffer+6,X
+;    ; Clear out the area
+;    LDA !TILE_BLANK : STA !ram_tilemap_buffer+0,X
+;                      STA !ram_tilemap_buffer+2,X
+;                      STA !ram_tilemap_buffer+4,X
+;                      STA !ram_tilemap_buffer+6,X
 
     ; set data bank for number table
     PHB : PEA.w NumberGFXTable>>8 : PLB : PLB
@@ -932,7 +932,7 @@ draw_numfield_hex_word:
 
     ; overwrite palette bytes
     %a8()
-    LDA.b !PALETTE_SELECTED : ORA !DP_Palette
+    LDA.b !PALETTE_SPECIAL
     STA !ram_tilemap_buffer+1,X : STA !ram_tilemap_buffer+3,X
     STA !ram_tilemap_buffer+5,X : STA !ram_tilemap_buffer+7,X
     %a16()
@@ -1299,9 +1299,10 @@ cm_edit_digits:
     LDA !ram_cm_horizontal_cursor : INC : AND #$0003 : STA !ram_cm_horizontal_cursor
   .redraw
     ; redraw numbers so selected digit is highlighted
-    LDX.w !ram_cm_stack_index : LDA !ram_cm_cursor_stack,X : TAY
+    LDX.w !ram_cm_stack_index
+    LDY.w !ram_cm_cursor_stack,X
     %item_index_to_vram_index()
-    TXA : CLC : ADC #$002C : TAX
+    TXA : CLC : ADC #$002A : TAX
     LDA [!DP_DigitAddress]
     JMP cm_draw4_editing ; and return from there
 
@@ -1322,7 +1323,7 @@ cm_edit_digits:
     ; redraw numbers
     LDX.w !ram_cm_stack_index : LDA !ram_cm_cursor_stack,X : TAY
     %item_index_to_vram_index()
-    TXA : CLC : ADC #$002C : TAX
+    TXA : CLC : ADC #$002A : TAX
     LDA [!DP_DigitAddress]
 
     ; fallthrough to cm_draw4_editing and return from there
@@ -1348,7 +1349,7 @@ cm_draw4_editing:
 
     ; set palette bytes to unselected
     %a8()
-    LDA.b !PALETTE_SELECTED
+    LDA.b !PALETTE_HEADER
     STA !ram_tilemap_buffer+1,X : STA !ram_tilemap_buffer+3,X
     STA !ram_tilemap_buffer+5,X : STA !ram_tilemap_buffer+7,X
 
@@ -1357,21 +1358,21 @@ cm_draw4_editing:
     DEC : BEQ .tens
     DEC : BEQ .hundreds
     ; thousands $X000
-    LDA.b !PALETTE_SELECTED|$10 : STA !ram_tilemap_buffer+1,X
+    LDA.b !PALETTE_SELECTED : STA !ram_tilemap_buffer+1,X
     BRA .done
   .hundreds ; $0X00
-    LDA.b !PALETTE_SELECTED|$10 : STA !ram_tilemap_buffer+3,X
+    LDA.b !PALETTE_SELECTED : STA !ram_tilemap_buffer+3,X
     BRA .done
   .tens ; $00X0
-    LDA.b !PALETTE_SELECTED|$10 : STA !ram_tilemap_buffer+5,X
+    LDA.b !PALETTE_SELECTED : STA !ram_tilemap_buffer+5,X
     BRA .done
   .ones ; $000X
-    LDA.b !PALETTE_SELECTED|$10 : STA !ram_tilemap_buffer+7,X
+    LDA.b !PALETTE_SELECTED : STA !ram_tilemap_buffer+7,X
 
   .done
     %a16()
-    JSL NMI_tilemap_transfer
     PLB
+    JSL NMI_tilemap_transfer
     RTS
 }
 
@@ -1504,7 +1505,8 @@ cm_edit_decimal_digits:
     TXA : CLC : ADC #$0006 : TAX
   .highlight
     ; number tiles are 60-69
-    LDA !ram_tilemap_buffer,X : ORA #$2D60 : STA !ram_tilemap_buffer,X
+!PALETTE_SELECTED = #$2D
+    LDA !ram_tilemap_buffer,X : ORA.w !PALETTE_SELECTED<<8|'0' : STA !ram_tilemap_buffer,X
 
     JSL NMI_tilemap_transfer
     RTS

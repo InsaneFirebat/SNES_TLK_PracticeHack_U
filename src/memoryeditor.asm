@@ -9,8 +9,7 @@ MemoryEditorMenu:
     dw #$FFFF
     dw #memory_size
     dw #$FFFF
-    dw #memory_edit_hi
-    dw #memory_edit_lo
+    dw #memory_edit
     dw #memory_edit_write
     dw #$0000
     %cm_header("MEMORY EDITOR")
@@ -31,47 +30,27 @@ memory_size:
     db !PALETTE_SPECIAL, "      8-BIT", #$FF
     db $FF
 
-memory_edit_hi:
-    %cm_numfield_hex("Edit High Byte", !ram_mem_editor_hi, 0, 255, 1, 8, #0)
-
-memory_edit_lo:
-    %cm_numfield_hex("Edit Low Byte", !ram_mem_editor_lo, 0, 255, 1, 8, #0)
+memory_edit:
+    %cm_numfield_hex_word("Value to Write", !ram_mem_editor, #$FFFF, #0)
 
 memory_edit_write:
     %cm_jsl("Write to Address", .routine, #0)
   .routine
     ; setup indirect addressing
-    %a8()
-    LDA !ram_mem_address_lo : STA !DP_Address
-    LDA !ram_mem_address_hi : STA !DP_Address+1
+    LDA !ram_mem_address : STA !DP_Address
     LDA !ram_mem_address_bank : STA !DP_Address+2
-
-    LDA !ram_mem_memory_size : BNE .eight_bit
-    ; 16-bit write
-    LDA !ram_mem_editor_hi : XBA : LDA !ram_mem_editor_lo
-    %a16()
-    STA [!DP_Address]
-    RTL
-  .eight_bit
-    LDA !ram_mem_editor_hi : XBA : LDA !ram_mem_editor_lo
-    STA [!DP_Address]
+    ; determine size
+    LDA !ram_mem_memory_size : BEQ .sixteen
+    %a8()
+  .sixteen
+    LDA !ram_mem_editor : STA [!DP_Address]
     RTL
 
 
 cm_editor_menu_prep:
 {
     LDA #$0001 : STA !ram_mem_editor_active
-
-    ; split address hi and lo
-    LDA !ram_mem_address
-    %a8()
-    STA !ram_mem_address_lo : XBA : STA !ram_mem_address_hi
-    %a16()
-
-    ; clear tilemap
-    JSL cm_tilemap_bg
-
-    RTL
+    JML cm_tilemap_bg
 }
 
 
@@ -81,14 +60,8 @@ cm_memory_editor:
     LDA !ram_mem_editor_active : BNE +
     RTL
 
-    ; assemble address word
-+   %a8()
-    LDA !ram_mem_address_hi : XBA : LDA !ram_mem_address_lo
-    %a16()
-    STA !ram_mem_address
-
     ; draw the address bank
-    LDA !ram_mem_address_bank : STA !ram_draw_value
++   LDA !ram_mem_address_bank : STA !ram_draw_value
     LDX #$044E : JSL cm_draw2_hex
 
     ; draw the address word
@@ -121,17 +94,17 @@ cm_memory_editor:
     STA !ram_tilemap_buffer+$172 ; Bank
     STA !ram_tilemap_buffer+$1AE ; High
 ;    STA !ram_tilemap_buffer+$1F2 ; Low
-    STA !ram_tilemap_buffer+$2B2 ; High
-    STA !ram_tilemap_buffer+$2F2 ; Low
+    STA !ram_tilemap_buffer+$2AE ; High
+;    STA !ram_tilemap_buffer+$2F2 ; Low
     STA !ram_tilemap_buffer+$428 ; Value
     STA !ram_tilemap_buffer+$44C ; Address
 
     ; draw ADDRESS
-    LDA.w !PALETTE_SPECIAL<<8|'A' : STA !ram_tilemap_buffer+$40C
-    LDA.w !PALETTE_SPECIAL<<8|'D' : STA !ram_tilemap_buffer+$40E : STA !ram_tilemap_buffer+$410
-    LDA.w !PALETTE_SPECIAL<<8|'R' : STA !ram_tilemap_buffer+$412
-    LDA.w !PALETTE_SPECIAL<<8|'E' : STA !ram_tilemap_buffer+$414
-    LDA.w !PALETTE_SPECIAL<<8|'S' : STA !ram_tilemap_buffer+$416 : STA !ram_tilemap_buffer+$418
+    LDA.w !PALETTE_SELECTED<<8|'A' : STA !ram_tilemap_buffer+$40C
+    LDA.w !PALETTE_SELECTED<<8|'D' : STA !ram_tilemap_buffer+$40E : STA !ram_tilemap_buffer+$410
+    LDA.w !PALETTE_SELECTED<<8|'R' : STA !ram_tilemap_buffer+$412
+    LDA.w !PALETTE_SELECTED<<8|'E' : STA !ram_tilemap_buffer+$414
+    LDA.w !PALETTE_SELECTED<<8|'S' : STA !ram_tilemap_buffer+$416 : STA !ram_tilemap_buffer+$418
 
     ; HEX and DEC labels
     LDA.w !PALETTE_SELECTED<<8|'H' : STA !ram_tilemap_buffer+$420

@@ -95,26 +95,27 @@ org !MENU_RAM_START+$38 : ram_cm_difficulty:
 org !MENU_RAM_START+$3A : ram_cm_horizontal_cursor:
 
 org $000000 : DP_JSLTarget:
-org $00005C : DP_Temp:
-org $00005C : DP_Frames:
-org $00005C : DP_Minimum:
-org $00005E : DP_Maximum:
-org $00005E : DP_Value:
-org $00005E : DP_Seconds:
-org $000060 : DP_Minutes:
-org $000060 : DP_Increment:
-org $000062 : DP_Palette:
-org $000064 : DP_MenuIndices:
-org $000066 : DP_MenuBank:
-org $000068 : DP_CurrentMenu:
-org $00006C : DP_Address:
-org $000070 : DP_FirstDigit:
-org $000072 : DP_SecondDigit:
-org $000074 : DP_ThirdDigit:
-org $000076 : DP_DigitAddress:
-org $00007A : DP_DigitValue:
-org $00007C : DP_DigitMinimum:
-org $00007E : DP_DigitMaximum:
+org $001E7C : DP_Temp:
+org $001E7C : DP_Frames:
+org $001E7C : DP_Minimum:
+org $001E7E : DP_Maximum:
+org $001E7E : DP_Value:
+org $001E7E : DP_Seconds:
+org $001E80 : DP_Minutes:
+org $001E80 : DP_Toggle:
+org $001E80 : DP_Increment:
+org $001E82 : DP_Palette:
+org $001E84 : DP_MenuIndices:
+org $001E86 : DP_MenuBank:
+org $001E88 : DP_CurrentMenu:
+org $001E8C : DP_Address:
+org $001E90 : DP_FirstDigit:
+org $001E92 : DP_SecondDigit:
+org $001E94 : DP_ThirdDigit:
+org $001E96 : DP_DigitAddress:
+org $001E9A : DP_DigitValue:
+org $001E9C : DP_DigitMinimum:
+org $001E9E : DP_DigitMaximum:
 
 org !MENU_PALETTES+$00 : ram_cm_cgram:
 org !MENU_PALETTES+$02 : ram_pal_header_outline:
@@ -127,19 +128,19 @@ org !MENU_PALETTES+$1A : ram_pal_selected_outline:
 org !MENU_PALETTES+$1E : ram_pal_selected_fill:
 org !MENU_PALETTES+$04 : ram_pal_background:
 org !MENU_PALETTES+$20 : ram_cm_cgram_backup:
-org !MENU_PALETTES+$40 : sram_pal_blue:
-org !MENU_PALETTES+$42 : sram_pal_green:
-org !MENU_PALETTES+$44 : sram_pal_red:
-org !MENU_PALETTES+$46 : ram_pal_lo:
-org !MENU_PALETTES+$48 : ram_pal_hi:
+org !MENU_PALETTES+$40 : ram_pal_blue:
+org !MENU_PALETTES+$42 : ram_pal_green:
+org !MENU_PALETTES+$44 : ram_pal_red:
+org !MENU_PALETTES+$46 : ram_pal:
 
 org !WRAM_START+$00 : ram_temp:
 org !WRAM_START+$02 : ram_levelselect_enable:
 org !WRAM_START+$04 : ram_levelselect_target:
-org !WRAM_START+$06 : ram_TimeAttack_DoNotRecord:
-org !WRAM_START+$08 : ram_TimeControl_mode:
-org !WRAM_START+$0A : ram_TimeControl_frames:
-org !WRAM_START+$0C : ram_TimeControl_timer:
+org !WRAM_START+$06 : ram_levelselect_checkpoint:
+org !WRAM_START+$08 : ram_TimeAttack_DoNotRecord:
+org !WRAM_START+$0A : ram_TimeControl_mode:
+org !WRAM_START+$0C : ram_TimeControl_frames:
+org !WRAM_START+$0E : ram_TimeControl_timer:
 
 org !WRAM_START+$10 : ram_death_loops:
 org !WRAM_START+$12 : ram_play_music_track:
@@ -147,8 +148,6 @@ org !WRAM_START+$14 : ram_loadstate_repeat:
 org !WRAM_START+$16 : ram_loadstate_2100:
 org !WRAM_START+$17 : ram_loadstate_4200:
 org !WRAM_START+$18 : ram_lag_display:
-
-
 
 org !WRAM_START+$20 : ram_timer_frames:
 org !WRAM_START+$21 : ram_timer_seconds:
@@ -164,19 +163,16 @@ org !WRAM_START+$2E : ram_timer_ignore:
 org !WRAM_START+$40 : ram_mem_editor_active:
 org !WRAM_START+$42 : ram_mem_address_bank:
 org !WRAM_START+$44 : ram_mem_address:
-org !WRAM_START+$46 : ram_mem_address_hi:
-org !WRAM_START+$48 : ram_mem_address_lo:
-org !WRAM_START+$4A : ram_mem_memory_size:
-org !WRAM_START+$4C : ram_mem_editor_hi:
-org !WRAM_START+$4E : ram_mem_editor_lo:
-org !WRAM_START+$50 : ram_draw_value:
-org !WRAM_START+$52 : ram_mem_line_position:
-org !WRAM_START+$54 : ram_mem_loop_counter:
-org !WRAM_START+$56 : ram_TimeControl_P1:
-org !WRAM_START+$58 : ram_TimeControl_P2:
-org !WRAM_START+$5A : LK_Controller_P2New:
-org !WRAM_START+$5C : LK_Controller_P2Current:
-org !WRAM_START+$5E : LK_Controller_P2Filtered:
+org !WRAM_START+$46 : ram_mem_memory_size:
+org !WRAM_START+$48 : ram_mem_editor:
+org !WRAM_START+$4A : ram_draw_value:
+org !WRAM_START+$4C : ram_mem_line_position:
+org !WRAM_START+$4E : ram_mem_loop_counter:
+org !WRAM_START+$50 : ram_TimeControl_P1:
+org !WRAM_START+$52 : ram_TimeControl_P2:
+org !WRAM_START+$54 : LK_Controller_P2New:
+org !WRAM_START+$56 : LK_Controller_P2Current:
+org !WRAM_START+$58 : LK_Controller_P2Filtered:
 
 
 ; SRAM
