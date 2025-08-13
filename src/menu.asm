@@ -1499,7 +1499,6 @@ cm_edit_decimal_digits:
     TXA : CLC : ADC #$0006 : TAX
   .highlight
     ; number tiles are 60-69
-!PALETTE_SELECTED = #$2D
     LDA !ram_tilemap_buffer,X : ORA.w !PALETTE_SELECTED<<8|'0' : STA !ram_tilemap_buffer,X
 
     JSL NMI_tilemap_transfer
@@ -1650,14 +1649,12 @@ action_mainmenu:
     LDA !ram_cm_cursor_stack : TAX
     LDA.l MainMenuBanks,X : STA !ram_cm_menu_bank
     STA !DP_MenuIndices+2 : STA !DP_CurrentMenu+2
-
-    BRA action_submenu_skipStackOp
+    PLB
+    ; Fallthrough to action_submenu
 }
 
 action_submenu:
 {
-    PHB
-  .skipStackOp
     ; Increment stack pointer by 2, then store current menu
     LDA !ram_cm_stack_index : INC #2 : STA !ram_cm_stack_index : TAX
     TYA : STA !ram_cm_menu_stack,X
@@ -1670,7 +1667,6 @@ action_submenu:
     JSL cm_colors
     JSL cm_draw
 
-    PLB
     RTL
 }
 

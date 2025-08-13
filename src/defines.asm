@@ -11,7 +11,7 @@
 !VERSION_MINOR = 0
 !VERSION_BUILD = 4
 !VERSION_REV_1 = 0
-!VERSION_REV_2 = 2
+!VERSION_REV_2 = 3
 !SRAM_VERSION = #$0001 ; inc this to force initialization of new SRAM
 
 !TILE_CLEAR = #$0140
@@ -159,7 +159,9 @@
 !ram_loadstate_4200 = !WRAM_START+$17 ; 0x1
 !ram_lag_display = !WRAM_START+$18
 
-; FREE SPACE ^ up to +$1E
+!ram_cm_dummy_on = !WRAM_START+$1A
+!ram_cm_dummy_off = !WRAM_START+$1C
+!ram_cm_dummy_num = !WRAM_START+$1E
 
 !ram_timer_frames = !WRAM_START+$20 ; 0x1
 !ram_timer_seconds = !WRAM_START+$21 ; 0x1

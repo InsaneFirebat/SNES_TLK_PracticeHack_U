@@ -352,6 +352,7 @@ levelselect_execute_list:
     LDA #$0001 : STA !ram_levelselect_enable 
     STA !LK_Loading_Trigger
     STA !ram_cm_leave
+    LDA #$0000 : STA !ram_TimeControl_mode
     RTL
 }
 

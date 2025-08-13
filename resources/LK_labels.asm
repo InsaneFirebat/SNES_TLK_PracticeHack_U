@@ -149,6 +149,8 @@ org !WRAM_START+$16 : ram_loadstate_2100:
 org !WRAM_START+$17 : ram_loadstate_4200:
 org !WRAM_START+$18 : ram_lag_display:
 
+; FREE SPACE up to +$1E
+
 org !WRAM_START+$20 : ram_timer_frames:
 org !WRAM_START+$21 : ram_timer_seconds:
 org !WRAM_START+$22 : ram_timer_minutes:
@@ -159,6 +161,8 @@ org !WRAM_START+$29 : ram_previous_seconds:
 org !WRAM_START+$2A : ram_previous_minutes:
 org !WRAM_START+$2C : ram_timer_recorded:
 org !WRAM_START+$2E : ram_timer_ignore:
+
+; FREE SPACE up to +$3E
 
 org !WRAM_START+$40 : ram_mem_editor_active:
 org !WRAM_START+$42 : ram_mem_address_bank:

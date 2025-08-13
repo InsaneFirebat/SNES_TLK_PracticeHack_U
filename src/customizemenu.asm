@@ -91,36 +91,34 @@ palettes_background:
     %palettemenu("Background", PalettesMenu_Background, !sram_pal_background)
 
 palettes_hex_red:
-    %cm_numfield_color("Hexadecimal Red", !ram_pal_red, #MixRGB_long)
+    %cm_numfield_color("Hexadecimal Red", !ram_pal_red, #MixRGB)
 
 palettes_hex_green:
-    %cm_numfield_color("Hexadecimal Green", !ram_pal_green, #MixRGB_long)
+    %cm_numfield_color("Hexadecimal Green", !ram_pal_green, #MixRGB)
 
 palettes_hex_blue:
-    %cm_numfield_color("Hexadecimal Blue", !ram_pal_blue, #MixRGB_long)
+    %cm_numfield_color("Hexadecimal Blue", !ram_pal_blue, #MixRGB)
 
 palettes_dec_red:
-    %cm_numfield("Decimal Red", !ram_pal_red, 0, 31, 1, 2, #MixRGB_long)
+    %cm_numfield("Decimal Red", !ram_pal_red, 0, 31, 1, 2, #MixRGB)
 
 palettes_dec_green:
-    %cm_numfield("Decimal Green", !ram_pal_green, 0, 31, 1, 2, #MixRGB_long)
+    %cm_numfield("Decimal Green", !ram_pal_green, 0, 31, 1, 2, #MixRGB)
 
 palettes_dec_blue:
-    %cm_numfield("Decimal Blue", !ram_pal_blue, 0, 31, 1, 2, #MixRGB_long)
+    %cm_numfield("Decimal Blue", !ram_pal_blue, 0, 31, 1, 2, #MixRGB)
 
-MixRGB_long:
-{
-    JSL MixRGB
-    RTL
-}
+palettes_dummy_on:
+    %cm_toggle("Example Toggle ON", !ram_cm_dummy_on, #$01, #0)
 
-MixBGR:
-{
-    JSL cm_colors
-    JSL MixRGB_long
-    RTL
-}
+palettes_dummy_off:
+    %cm_toggle("Example Toggle OFF", !ram_cm_dummy_off, #$01, #0)
 
+palettes_dummy_hexnum:
+    %cm_numfield_hex("Example Hex Number", !ram_cm_dummy_num, 0, 255, 1, 8, #0)
+
+palettes_dummy_num:
+    %cm_numfield("Example Decimal Number", !ram_cm_dummy_num, 0, 255, 1, 8, #0)
 
 palettes_display_menu:
     %cm_submenu("Screenshot To Share Colors", #PalettesDisplayMenu)
@@ -215,15 +213,17 @@ copy_menu_palette:
 +   ASL : TAX : LDA.l PaletteProfileTable,X : STA !DP_Temp
 
     ; copy table to SRAM
-    LDY #$0002 : LDA (!DP_Temp),Y : STA !sram_pal_header_outline
-    LDY #$0006 : LDA (!DP_Temp),Y : STA !sram_pal_header_fill
-    LDY #$000A : LDA (!DP_Temp),Y : STA !sram_pal_text_outline
-    LDY #$000E : LDA (!DP_Temp),Y : STA !sram_pal_text_fill
-    LDY #$0012 : LDA (!DP_Temp),Y : STA !sram_pal_special_outline
-    LDY #$0016 : LDA (!DP_Temp),Y : STA !sram_pal_special_fill
-    LDY #$001A : LDA (!DP_Temp),Y : STA !sram_pal_selected_outline
-    LDY #$001E : LDA (!DP_Temp),Y : STA !sram_pal_selected_fill
-    LDY #$000C : LDA (!DP_Temp),Y : STA !sram_pal_background
+    %i8()
+    LDY #$02 : LDA (!DP_Temp),Y : STA !sram_pal_header_outline
+    LDY #$06 : LDA (!DP_Temp),Y : STA !sram_pal_header_fill
+    LDY #$0A : LDA (!DP_Temp),Y : STA !sram_pal_text_outline
+    LDY #$0E : LDA (!DP_Temp),Y : STA !sram_pal_text_fill
+    LDY #$12 : LDA (!DP_Temp),Y : STA !sram_pal_special_outline
+    LDY #$16 : LDA (!DP_Temp),Y : STA !sram_pal_special_fill
+    LDY #$1A : LDA (!DP_Temp),Y : STA !sram_pal_selected_outline
+    LDY #$1E : LDA (!DP_Temp),Y : STA !sram_pal_selected_fill
+    LDY #$0C : LDA (!DP_Temp),Y : STA !sram_pal_background
+    %i16()
 
     ; refresh current profile
     JSL refresh_custom_palettes
@@ -234,7 +234,6 @@ copy_menu_palette:
   .fail
     ; no SFX yet, do nothing
 ;    %sfxdachora()
-    PLB
     RTL
 }
 
@@ -280,16 +279,13 @@ cm_copy_cgram:
 }
 
 PaletteProfileTable:
-    dw #CustomPaletteProfile ; dummy
+    dw #$0000 ; dummy
     dw #RedPaletteProfile
     dw #GreenPaletteProfile
     dw #BrownPaletteProfile
 
 ;         Header Back   Header        Text   Back   Text          SpecialBack   Special       Select Back   Select 
 ;         Outer  Ground Fill          Outer  Ground Fill          Outer  Ground Fill          Outer  Ground Fill   
-CustomPaletteProfile:
-dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000 ; delete later
-
 RedPaletteProfile:
 dw $0000, $001F, $0000, $4B5F, $0000, $365F, $0000, $0095, $0000, $00FF, $0000, $03FF, $0000, $577D, $0000, $001F
 
@@ -299,6 +295,11 @@ dw $0000, $1DE6, $0000, $03E0, $0000, $026A, $0000, $05E6, $0000, $01FA, $0000, 
 BrownPaletteProfile:
 dw $0000, $0132, $0000, $01FA, $0000, $0132, $0000, $0889, $0000, $01FA, $0000, $035F, $0000, $19B3, $0000, $2636
 
+cm_update_colors:
+{
+    JSL cm_colors
+    JML MixRGB
+}
 
 cm_colors:
 {
@@ -309,15 +310,13 @@ cm_colors:
     CMP #$0012 : BPL .done ; exit if beyond table boundaries
 
     PHB : PHK : PLB
-    JSR (ColorMenuTable,X) ; runs cm_setup_RGB for selected menu
-    PLB
+    %a8()
+    JSR (ColorMenuTable,X) ; runs setupRGB macro routine for selected menu
 
-  .done
-    RTL
-}
+    ; address in X, bank in A
+    STX !DP_Temp : STA !DP_Temp+2
+    %a16()
 
-cm_setup_RGB:
-{
     ; Split 15-bit SNES "BGR" color value into individual 5-bit RGB values
     LDA [!DP_Temp] : AND #$7C00 : XBA : LSR #2 : STA !ram_pal_blue
     LDA [!DP_Temp] : AND #$03E0 : LSR #5 : STA !ram_pal_green
@@ -325,6 +324,9 @@ cm_setup_RGB:
     ; Split 16-bit value into two 16-bit values for the menu
     LDA [!DP_Temp] : STA !ram_pal
     %a16()
+    PLB
+
+  .done
     RTL
 }
 
@@ -359,6 +361,7 @@ MenuPaletteTable:
     dw !sram_pal_selected_fill
     dw !sram_pal_background
 }
+
 
 ColorMenuTable:
     dw ColorMenuTable_header_outline
